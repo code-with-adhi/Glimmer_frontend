@@ -6,25 +6,32 @@ import React, {
   ReactNode,
 } from "react";
 
-// Define the shape of the context data
 interface AuthContextType {
   token: string | null;
+  isAuthLoading: boolean; // <-- NEW: The loading state
   login: (token: string) => void;
   logout: () => void;
 }
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create the provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true); // <-- NEW: Initialize as true
 
-  // On initial load, check localStorage for a token
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
+    try {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        setToken(storedToken);
+      }
+    } catch (error) {
+      console.error("Failed to access localStorage", error);
+    } finally {
+      // --- THIS IS THE KEY ---
+      // After checking, set loading to false
+      setIsAuthLoading(false);
+      // ----------------------
     }
   }, []);
 
@@ -39,13 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    // Expose the new loading state to the rest of the app
+    <AuthContext.Provider value={{ token, isAuthLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// Create a custom hook to easily use the context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
