@@ -1,42 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { getMe } from "../services/apiService";
-import type { User } from "../services/apiService";
+import { getDiscoveryFeed } from "../services/apiService";
+import type { UserDiscoveryDTO } from "../services/apiService";
+import ProfileCard from "../components/ProfileCard";
+import { Link } from "react-router-dom";
 
 function HomePage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [feed, setFeed] = useState<UserDiscoveryDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect runs once when the component first loads
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchFeed = async () => {
       try {
-        const response = await getMe();
-        setUser(response.data);
+        const response = await getDiscoveryFeed();
+        setFeed(response.data);
       } catch (err) {
-        setError("Failed to fetch user data. Please try logging in again.");
+        setError("Failed to fetch discovery feed.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchUserData();
-  }, []); // The empty array [] means this effect runs only once on mount
+    fetchFeed();
+  }, []);
 
   if (loading) {
-    return <div className="p-8">Loading your profile...</div>;
+    return <div className="p-8 text-center">Finding people near you...</div>;
   }
 
   if (error) {
-    return <div className="p-8 text-red-500">{error}</div>;
+    return <div className="p-8 text-center text-red-500">{error}</div>;
   }
 
   return (
-    <div className="p-8">
-      {user && (
-        <h1 className="text-3xl font-bold">Welcome back, {user.firstName}!</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        Discover People You Might Like
+      </h1>
+      {feed.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {feed.map((feedItem) => (
+            <Link to={`/users/${feedItem.user.id}`} key={feedItem.user.id}>
+              <ProfileCard
+                user={feedItem.user}
+                score={feedItem.compatibilityScore}
+              />
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-500">
+          That's everyone for now! Check back later.
+        </p>
       )}
-      <p className="mt-4">This is your protected home page.</p>
     </div>
   );
 }

@@ -1,20 +1,33 @@
 import axios, { AxiosResponse } from "axios";
 
 // --- TYPE DEFINITIONS ---
+export interface Profile {
+  bio?: string;
+}
 
-// Represents the full user object returned from the backend
+export interface TopPick {
+  id: number;
+  name: string;
+  category: string;
+}
+
+export interface UserTopPick {
+  id: number;
+  topPick: TopPick;
+}
+
+// --- THIS IS THE UPDATED INTERFACE ---
 export interface User {
   id: string;
   email: string;
   firstName: string;
-  gender?: string;
-  dateOfBirth: string;
-  profile?: {
-    bio?: string;
-  };
+  dateOfBirth: string; // Added this field
+  gender?: string; // Added this field
+  profile?: Profile;
+  topPicks?: UserTopPick[];
 }
+// ------------------------------------
 
-// Data for the registration form
 export interface UserData {
   firstName: string;
   email: string;
@@ -22,72 +35,104 @@ export interface UserData {
   dateOfBirth: string;
   gender?: string;
 }
-
-// Data for the login form
 export interface LoginData {
   email: string;
   password: string;
 }
-
-// Data shape of the login response from the backend
 export interface LoginResponse {
   token: string;
 }
-
-// Data for updating a user's profile
 export interface ProfileData {
   bio: string;
 }
+export interface UserDiscoveryDTO {
+  user: User;
+  compatibilityScore: number;
+}
+
+// --- API URLs ---
+const USERS_API_URL = "/api/users";
+const PROFILES_API_URL = "/api/profiles";
+const DISCOVERY_API_URL = "/api/discovery";
+const TOPPICKS_API_URL = "/api/toppicks";
+const ME_API_URL = "/api/me";
 
 // --- API FUNCTIONS ---
-
-const API_URL = "/api/users";
-const PROFILE_API_URL = "/api/profiles";
-
-/**
- * Sends a registration request to the backend.
- * @param userData The user's registration data.
- */
 export const registerUser = (
   userData: UserData
 ): Promise<AxiosResponse<User>> => {
-  return axios.post(`${API_URL}/register`, userData);
+  return axios.post(`${USERS_API_URL}/register`, userData);
 };
 
-/**
- * Sends a login request to the backend.
- * @param loginData The user's login credentials.
- */
 export const loginUser = (
   loginData: LoginData
 ): Promise<AxiosResponse<LoginResponse>> => {
-  return axios.post(`${API_URL}/login`, loginData);
+  return axios.post(`${USERS_API_URL}/login`, loginData);
 };
 
-/**
- * Fetches the currently authenticated user's profile data.
- * Requires a JWT to be sent in the headers.
- */
 export const getMe = (): Promise<AxiosResponse<User>> => {
   const token = localStorage.getItem("token");
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-  return axios.get(`${API_URL}/me`, config);
+  return axios.get(`${USERS_API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 };
 
-/**
- * Updates the currently authenticated user's profile.
- * Requires a JWT to be sent in the headers.
- * @param profileData The profile data to update.
- */
 export const updateProfile = (profileData: ProfileData) => {
   const token = localStorage.getItem("token");
-  return axios.put(`${PROFILE_API_URL}/me`, profileData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  return axios.put(`${PROFILES_API_URL}/me`, profileData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getDiscoveryFeed = (): Promise<
+  AxiosResponse<UserDiscoveryDTO[]>
+> => {
+  const token = localStorage.getItem("token");
+  return axios.get(`${DISCOVERY_API_URL}/feed`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const getUserById = (userId: string): Promise<AxiosResponse<User>> => {
+  const token = localStorage.getItem("token");
+  return axios.get(`${USERS_API_URL}/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const likeUser = (likedUserId: string) => {
+  const token = localStorage.getItem("token");
+  return axios.post(
+    `${DISCOVERY_API_URL}/like/${likedUserId}`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+};
+export const getTopPicksByCategory = (
+  category: string
+): Promise<AxiosResponse<TopPick[]>> => {
+  const token = localStorage.getItem("token");
+  return axios.get(TOPPICKS_API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { category },
+  });
+};
+
+export const addUserTopPick = (
+  topPickId: number
+): Promise<AxiosResponse<UserTopPick>> => {
+  const token = localStorage.getItem("token");
+  return axios.post(`${ME_API_URL}/toppicks`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { topPickId },
+  });
+};
+
+export const removeUserTopPick = (userTopPickId: number) => {
+  const token = localStorage.getItem("token");
+  return axios.delete(`${ME_API_URL}/toppicks/${userTopPickId}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
 };
