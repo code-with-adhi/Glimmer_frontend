@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { type UserData, registerUser } from "../services/apiService";
+import { useNavigate } from "react-router-dom";
+import { registerUser, loginUser } from "../services/apiService";
+import type { UserData } from "../services/apiService";
+import { useAuth } from "../context/AuthContext";
 
 function RegisterPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState<UserData>({
     firstName: "",
     email: "",
@@ -18,33 +23,31 @@ function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await registerUser(formData);
-      console.log("User registered successfully:", response.data);
-      alert("Registration successful! Check the console for user data.");
+      await registerUser(formData);
+      const loginResponse = await loginUser({
+        email: formData.email,
+        password: formData.password,
+      });
+      login(loginResponse.data.token);
+      navigate("/onboarding");
     } catch (error: any) {
-      const errorMessage = error.response?.data || "An error occurred.";
-      console.error("Error during registration:", errorMessage);
-      alert(`Registration failed: ${errorMessage}`);
+      alert(
+        `Registration failed: ${error.response?.data || "An error occurred."}`
+      );
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Register for Glimmer
-        </h2>
+    <div className="onboarding-page-container">
+      <div className="form-container">
+        <h2 className="form-title">Register for Glimmer</h2>
         <form onSubmit={handleSubmit}>
-          {/* Form fields remain the same */}
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="firstName"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="firstName">
               First Name
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="firstName"
               type="text"
               name="firstName"
@@ -53,15 +56,12 @@ function RegisterPage() {
               required
             />
           </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="email"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="email">
               Email
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="email"
               type="email"
               name="email"
@@ -70,15 +70,12 @@ function RegisterPage() {
               required
             />
           </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="password"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="password">
               Password
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="password"
               type="password"
               name="password"
@@ -87,15 +84,12 @@ function RegisterPage() {
               required
             />
           </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="dateOfBirth"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="dateOfBirth">
               Date of Birth
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="dateOfBirth"
               type="date"
               name="dateOfBirth"
@@ -104,15 +98,12 @@ function RegisterPage() {
               required
             />
           </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="gender"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="gender">
               Gender
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="gender"
               type="text"
               name="gender"
@@ -121,7 +112,8 @@ function RegisterPage() {
             />
           </div>
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            className="button button-primary"
+            style={{ marginTop: "1.5rem" }}
             type="submit"
           >
             Register

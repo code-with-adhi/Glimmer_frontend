@@ -19,38 +19,29 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
-
+    setError(null);
     try {
       const response = await loginUser(formData);
-      // Use the context's login function to set the token globally
       login(response.data.token);
-      // Redirect to the home page
       navigate("/");
     } catch (err: any) {
       const errorMessage =
         err.response?.data || "Login failed. Please try again.";
       setError(errorMessage);
-      console.error(errorMessage);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Login to Glimmer
-        </h2>
+    <div className="onboarding-page-container">
+      <div className="form-container">
+        <h2 className="form-title">Login to Glimmer</h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="email"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="email">
               Email
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="email"
               type="email"
               name="email"
@@ -59,15 +50,12 @@ function LoginPage() {
               required
             />
           </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="password"
-            >
+          <div className="form-section">
+            <label className="form-label" htmlFor="password">
               Password
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+              className="text-input"
               id="password"
               type="password"
               name="password"
@@ -76,13 +64,24 @@ function LoginPage() {
               required
             />
           </div>
-          {/* Display error message if it exists */}
-          {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
+          {error && (
+            <p
+              style={{
+                color: "#c62828",
+                fontSize: "0.875rem",
+                marginTop: "1rem",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </p>
+          )}
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            className="button button-primary"
+            style={{ marginTop: "1.5rem" }}
             type="submit"
           >
-            Log In
+            Sign In
           </button>
         </form>
       </div>

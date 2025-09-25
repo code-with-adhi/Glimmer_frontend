@@ -1,32 +1,32 @@
 import axios, { AxiosResponse } from "axios";
 
 // --- TYPE DEFINITIONS ---
+export interface SportAndTeam {
+  sport: string;
+  team: string;
+}
+
 export interface Profile {
   bio?: string;
+  movieGenres?: string[];
+  favoriteMovies?: string[];
+  musicGenres?: string[];
+  favoriteArtists?: string[];
+  favoriteSports?: SportAndTeam[];
+  hobbies?: string[];
+  nicheHobby?: string;
+  questionnaireAnswers?: Record<number, string>;
 }
 
-export interface TopPick {
-  id: number;
-  name: string;
-  category: string;
-}
-
-export interface UserTopPick {
-  id: number;
-  topPick: TopPick;
-}
-
-// --- THIS IS THE UPDATED INTERFACE ---
 export interface User {
   id: string;
   email: string;
   firstName: string;
-  dateOfBirth: string; // Added this field
-  gender?: string; // Added this field
+  dateOfBirth: string;
+  gender?: string;
   profile?: Profile;
-  topPicks?: UserTopPick[];
+  topPicks?: any[];
 }
-// ------------------------------------
 
 export interface UserData {
   firstName: string;
@@ -35,19 +35,33 @@ export interface UserData {
   dateOfBirth: string;
   gender?: string;
 }
+
 export interface LoginData {
   email: string;
   password: string;
 }
+
 export interface LoginResponse {
   token: string;
 }
-export interface ProfileData {
-  bio: string;
-}
+
 export interface UserDiscoveryDTO {
   user: User;
   compatibilityScore: number;
+}
+
+export interface InterestProfileUpdateRequest {
+  movieGenres?: string[];
+  favoriteMovies?: string[];
+  musicGenres?: string[];
+  favoriteArtists?: string[];
+  favoriteSports?: SportAndTeam[];
+  hobbies?: string[];
+  nicheHobby?: string;
+}
+
+export interface QuestionnaireUpdateRequest {
+  answers: Record<number, Character>;
 }
 
 // --- API URLs ---
@@ -77,7 +91,7 @@ export const getMe = (): Promise<AxiosResponse<User>> => {
   });
 };
 
-export const updateProfile = (profileData: ProfileData) => {
+export const updateProfile = (profileData: { bio: string }) => {
   const token = localStorage.getItem("token");
   return axios.put(`${PROFILES_API_URL}/me`, profileData, {
     headers: { Authorization: `Bearer ${token}` },
@@ -110,6 +124,7 @@ export const likeUser = (likedUserId: string) => {
     }
   );
 };
+
 export const getTopPicksByCategory = (
   category: string
 ): Promise<AxiosResponse<TopPick[]>> => {
@@ -133,6 +148,20 @@ export const addUserTopPick = (
 export const removeUserTopPick = (userTopPickId: number) => {
   const token = localStorage.getItem("token");
   return axios.delete(`${ME_API_URL}/toppicks/${userTopPickId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const updateInterestProfile = (data: InterestProfileUpdateRequest) => {
+  const token = localStorage.getItem("token");
+  return axios.put(`${PROFILES_API_URL}/me/interests`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const updateQuestionnaire = (data: QuestionnaireUpdateRequest) => {
+  const token = localStorage.getItem("token");
+  return axios.put(`${PROFILES_API_URL}/me/questionnaire`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };

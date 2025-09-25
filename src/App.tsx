@@ -6,42 +6,68 @@ function App() {
   const { token, logout } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-800 p-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
+    <div>
+      <nav className="app-nav">
+        <div
+          className="app-container"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Link
             to="/"
-            className="text-white text-xl font-bold hover:text-gray-300"
+            style={{
+              color: "#ad1457",
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              textDecoration: "none",
+            }}
           >
-            Glimmer
+            Glimmer 💕
           </Link>
-          <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
             {token ? (
-              // If logged in, show Profile and Logout
-              <div className="flex items-center">
+              <>
                 <Link
                   to="/profile"
-                  className="text-gray-300 hover:text-white mr-4"
+                  style={{
+                    color: "#6d1b7b",
+                    fontWeight: "500",
+                    textDecoration: "none",
+                  }}
                 >
                   Profile
                 </Link>
                 <button
                   onClick={logout}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  className="button button-secondary"
+                  style={{ width: "auto", padding: "0.5rem 1rem" }}
                 >
                   Logout
                 </button>
-              </div>
+              </>
             ) : (
-              // If logged out, show Login and Register
               <>
                 <Link
                   to="/login"
-                  className="text-gray-300 hover:text-white mr-4"
+                  style={{
+                    color: "#6d1b7b",
+                    fontWeight: "500",
+                    textDecoration: "none",
+                  }}
                 >
                   Login
                 </Link>
-                <Link to="/register" className="text-gray-300 hover:text-white">
+                <Link
+                  to="/register"
+                  style={{
+                    color: "#6d1b7b",
+                    fontWeight: "500",
+                    textDecoration: "none",
+                  }}
+                >
                   Register
                 </Link>
               </>
@@ -49,7 +75,8 @@ function App() {
           </div>
         </div>
       </nav>
-      <main className="container mx-auto p-4">
+
+      <main>
         <Outlet />
       </main>
     </div>

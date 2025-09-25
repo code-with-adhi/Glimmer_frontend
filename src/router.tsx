@@ -6,7 +6,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
-import UserProfilePage from "./pages/UserProfilePage"; // Import the new page
+import UserProfilePage from "./pages/UserProfilePage";
+import OnboardingPage from "./pages/OnboardingPage";
 
 export const router = createBrowserRouter([
   {
@@ -37,12 +38,19 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // This is the new dynamic route for viewing other users' profiles
       {
         path: "/users/:userId",
         element: (
           <ProtectedRoute>
             <UserProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/onboarding",
+        element: (
+          <ProtectedRoute>
+            <OnboardingPage />
           </ProtectedRoute>
         ),
       },
